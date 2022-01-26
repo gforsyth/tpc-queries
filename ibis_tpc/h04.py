@@ -6,8 +6,8 @@ from .utils import add_date
 def tpc_h04(con, DATE='1993-07-01'):
     orders = con.table('orders')
     lineitem = con.table('lineitem')
-    cond = ((lineitem.L_ORDERKEY == orders.O_ORDERKEY) &
-            (lineitem.L_COMMITDATE < lineitem.L_RECEIPTDATE))
+    cond = ((lineitem.l_orderkey == orders.o_orderkey) &
+            (lineitem.l_commitdate < lineitem.l_receiptdate))
     q = orders.filter([cond.any(),
                        orders.O_ORDERDATE >= DATE,
                        orders.O_ORDERDATE < add_date(DATE, dm=3)])

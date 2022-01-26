@@ -12,13 +12,13 @@ def tpc_h10(con, DATE='1993-10-01'):
 
     q = customer
     q = q.join(orders, customer.C_CUSTKEY == orders.O_CUSTKEY)
-    q = q.join(lineitem, lineitem.L_ORDERKEY == orders.O_ORDERKEY)
-    q = q.join(nation, customer.C_NATIONKEY == nation.N_NATIONKEY)
+    q = q.join(lineitem, lineitem.l_orderkey == orders.o_orderkey)
+    q = q.join(nation, customer.C_NATIONKEY == nation.n_nationkey)
     q = q.materialize()
 
     q = q.filter([
         (q.O_ORDERDATE >= DATE) & (q.O_ORDERDATE < add_date(DATE, dm=3)),
-        q.L_RETURNFLAG == 'R',
+        q.l_returnflag == 'r',
     ])
 
     gq = q.group_by([
@@ -26,11 +26,11 @@ def tpc_h10(con, DATE='1993-10-01'):
             q.C_NAME,
             q.C_ACCTBAL,
             q.C_PHONE,
-            q.N_NAME,
+            q.n_name,
             q.C_ADDRESS,
             q.C_COMMENT
     ])
-    q = gq.aggregate(revenue=(q.L_EXTENDEDPRICE*(1-q.L_DISCOUNT)).sum())
+    q = gq.aggregate(revenue=(q.l_extendedprice*(1-q.l_discount)).sum())
 
     q = q.sort_by(ibis.desc(q.revenue))
     return q.limit(20)

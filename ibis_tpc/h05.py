@@ -15,18 +15,18 @@ def tpc_h05(con, NAME='ASIA', DATE='1994-01-01'):
 
     q = customer
     q = q.join(orders, customer.C_CUSTKEY == orders.O_CUSTKEY)
-    q = q.join(lineitem, lineitem.L_ORDERKEY == orders.O_ORDERKEY)
-    q = q.join(supplier, lineitem.L_SUPPKEY == supplier.S_SUPPKEY)
-    q = q.join(nation, (customer.C_NATIONKEY == supplier.S_NATIONKEY) &
-                       (supplier.S_NATIONKEY == nation.N_NATIONKEY))
-    q = q.join(region, nation.N_REGIONKEY == region.R_REGIONKEY)
+    q = q.join(lineitem, lineitem.l_orderkey == orders.o_orderkey)
+    q = q.join(supplier, lineitem.l_suppkey == supplier.s_suppkey)
+    q = q.join(nation, (customer.C_NATIONKEY == supplier.s_nationkey) &
+                       (supplier.s_nationkey == nation.n_nationkey))
+    q = q.join(region, nation.n_regionkey == region.r_regionkey)
     q = q.materialize()
 
-    q = q.filter([q.R_NAME == NAME,
+    q = q.filter([q.r_name == name,
                   q.O_ORDERDATE >= DATE,
                   q.O_ORDERDATE < add_date(DATE, dy=1)])
-    revexpr = q.L_EXTENDEDPRICE*(1-q.L_DISCOUNT)
-    gq = q.group_by([q.N_NAME])
+    revexpr = q.l_extendedprice*(1-q.l_discount)
+    gq = q.group_by([q.n_name])
     q = gq.aggregate(revenue=revexpr.sum())
     q = q.sort_by([ibis.desc(q.revenue)])
     return q
